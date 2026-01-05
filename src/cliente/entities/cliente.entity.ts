@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { TipoPessoa } from '../enum/tipo-pessoa.enum';
+import { Apolice } from 'src/apolices/entities/apolice.entity';
 @Entity()
 export class Cliente {
   @PrimaryGeneratedColumn()
@@ -28,6 +30,9 @@ export class Cliente {
 
   @Column()
   telefone: string;
+
+  @OneToMany(() => Apolice, (apolice) => apolice.cliente)
+  apolices: Apolice[];
 
   @CreateDateColumn()
   createdAt: Date;
