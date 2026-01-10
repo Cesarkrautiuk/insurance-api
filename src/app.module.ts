@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ClienteModule } from './cliente/cliente.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolicesModule } from './apolices/apolices.module';
+import { PagamentoModule } from './pagamento/pagamento.module';
+import { SinistroModule } from './sinistro/sinistro.module';
 
 @Module({
   imports: [
@@ -14,11 +16,13 @@ import { ApolicesModule } from './apolices/apolices.module';
       port: 5432,
       username: 'postgres',
       password: '123456',
-      database: 'iinsurance_db',
+      database: 'insurance_db',
       synchronize: true,
       autoLoadEntities: true,
     }),
     ApolicesModule,
+    PagamentoModule,
+    SinistroModule,
   ],
   controllers: [AppController],
   providers: [AppService],

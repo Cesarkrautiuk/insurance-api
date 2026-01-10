@@ -4,11 +4,14 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { StatusApolice } from '../enum/status-apolice.enum';
 import { TipoSeguro } from '../enum/tipo-seguro.enum';
+import { Pagamento } from 'src/pagamento/entities/pagamento.entity';
+import { Sinistro } from 'src/sinistro/entities/sinistro.entity';
 
 @Entity()
 export class Apolice {
@@ -41,6 +44,10 @@ export class Apolice {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   valorMensal: number;
+  @OneToMany(() => Pagamento, (pagamento) => pagamento.apolice)
+  pagamentos: Pagamento[];
+  @OneToMany(() => Sinistro, (sinistro) => sinistro.apolice)
+  sinistros: Sinistro[];
 
   @CreateDateColumn()
   createdAt: Date;

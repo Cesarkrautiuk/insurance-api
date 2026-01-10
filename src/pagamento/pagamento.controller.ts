@@ -1,0 +1,28 @@
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { PagamentoService } from './pagamento.service';
+import { CreatePagamentoDto } from './dto/create-pagamento.dto';
+
+@Controller('pagamento')
+export class PagamentoController {
+  constructor(private readonly pagamentoService: PagamentoService) {}
+
+  @Post()
+  create(@Body() createPagamentoDto: CreatePagamentoDto) {
+    return this.pagamentoService.create(createPagamentoDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.pagamentoService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.pagamentoService.findOne(+id);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.pagamentoService.remove(+id);
+  }
+}
