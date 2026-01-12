@@ -1,21 +1,19 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
 import { CreateApoliceDto } from './dto/create-apolice.dto';
 import { UpdateApoliceDto } from './dto/update-apolice.dto';
-
 import { Apolice } from './entities/apolice.entity';
-import { Pagamento } from 'src/pagamento/entities/pagamento.entity';
-
 import { StatusApolice } from './enum/status-apolice.enum';
 import { DataSource } from 'typeorm';
 import { ClienteService } from 'src/cliente/cliente.service';
-import { StatusPagamento } from 'src/pagamento/enum/StatusPagamento ';
+import { PagamentoService } from 'src/pagamento/pagamento.service';
 
 @Injectable()
 export class ApolicesService {
@@ -23,11 +21,9 @@ export class ApolicesService {
     private readonly dataSource: DataSource,
     @InjectRepository(Apolice)
     private readonly apoliceRepository: Repository<Apolice>,
-
-    @InjectRepository(Pagamento)
-    private readonly pagamentoRepository: Repository<Pagamento>,
-
     private readonly clienteService: ClienteService,
+    @Inject(forwardRef(() => PagamentoService))
+    private readonly pagamentoService: PagamentoService,
   ) {}
 
   async create(dto: CreateApoliceDto): Promise<Apolice> {
@@ -38,6 +34,7 @@ export class ApolicesService {
         'Data de início deve ser menor que a data de fim',
       );
     }
+
     return this.dataSource.transaction(async (manager) => {
       const apolice = manager.create(Apolice, {
         cliente,
@@ -50,32 +47,13 @@ export class ApolicesService {
 
       const apoliceSalva = await manager.save(Apolice, apolice);
 
-      const pagamentos: Pagamento[] = [];
-
-      const inicio = new Date(dto.dataInicio);
-      const fim = new Date(dto.dataFim);
-      const diaBase = inicio.getDate();
-
-      const mesAtual = criarDataVencimento(
-        inicio.getFullYear(),
-        inicio.getMonth(),
-        diaBase,
+      await this.pagamentoService.gerarParcelas(
+        apoliceSalva,
+        dto.valorMensal,
+        dto.dataInicio,
+        dto.dataFim,
+        manager,
       );
-
-      while (mesAtual <= fim) {
-        pagamentos.push(
-          this.pagamentoRepository.create({
-            apolice: apoliceSalva,
-            valor: dto.valorMensal,
-            vencimento: new Date(mesAtual),
-            status: StatusPagamento.PENDENTE,
-          }),
-        );
-
-        mesAtual.setMonth(mesAtual.getMonth() + 1);
-      }
-
-      await manager.save(Pagamento, pagamentos);
 
       return manager.findOneOrFail(Apolice, {
         where: { id: apoliceSalva.id },
@@ -119,13 +97,4 @@ export class ApolicesService {
     const apolice = await this.findOne(id);
     await this.apoliceRepository.remove(apolice);
   }
-}
-function criarDataVencimento(ano: number, mes: number, diaBase: number): Date {
-  const data = new Date(ano, mes, diaBase);
-
-  if (data.getMonth() !== mes) {
-    return new Date(ano, mes + 1, 0);
-  }
-
-  return data;
 }
