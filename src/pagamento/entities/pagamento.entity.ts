@@ -21,12 +21,30 @@ export class Pagamento {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   valor: number;
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  multa: number;
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  juros: number;
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  valorAtualizado: number;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  multa?: number;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  juros?: number;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  valorAtualizado?: number;
 
   @Column({ type: 'date' })
   vencimento: Date;

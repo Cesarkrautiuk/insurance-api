@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolicesModule } from './apolices/apolices.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
 import { SinistroModule } from './sinistro/sinistro.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { SinistroModule } from './sinistro/sinistro.module';
     ApolicesModule,
     PagamentoModule,
     SinistroModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
