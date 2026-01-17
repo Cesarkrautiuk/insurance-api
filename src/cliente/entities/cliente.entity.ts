@@ -4,11 +4,14 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { TipoPessoa } from '../enum/tipo-pessoa.enum';
 import { Apolice } from 'src/apolices/entities/apolice.entity';
 @Entity()
+@Unique(['email'])
+@Unique(['documento'])
 export class Cliente {
   @PrimaryGeneratedColumn()
   id: number;

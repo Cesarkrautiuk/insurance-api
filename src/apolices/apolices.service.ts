@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   forwardRef,
   Inject,
   Injectable,
@@ -14,6 +13,8 @@ import { StatusApolice } from './enum/status-apolice.enum';
 import { DataSource } from 'typeorm';
 import { ClienteService } from 'src/cliente/cliente.service';
 import { PagamentoService } from 'src/pagamento/pagamento.service';
+import { ApoliceErrors } from 'src/common/errors/apolice-errors';
+import { BusinessException } from 'src/common/exceptions/business.exception';
 
 @Injectable()
 export class ApolicesService {
@@ -30,9 +31,7 @@ export class ApolicesService {
     const cliente = await this.clienteService.findOne(dto.clienteId);
 
     if (dto.dataInicio >= dto.dataFim) {
-      throw new BadRequestException(
-        'Data de início deve ser menor que a data de fim',
-      );
+      throw new BusinessException(ApoliceErrors.DATA_INVALIDA);
     }
 
     return this.dataSource.transaction(async (manager) => {
@@ -75,7 +74,10 @@ export class ApolicesService {
     });
 
     if (!apolice) {
-      throw new NotFoundException(`Apólice com ID ${id} não encontrada`);
+      throw new NotFoundException({
+        error: 'NotFound',
+        message: ApoliceErrors.NAO_ENCONTRADA,
+      });
     }
 
     return apolice;
